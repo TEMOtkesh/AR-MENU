@@ -2,51 +2,75 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AR Menu MVP</title>
     
-    <!-- Core Engine & Tracking Libraries -->
+    <!-- Core Engine & Tracking -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
+
+    <style>
+      /* This makes sure the "Loading" text is visible over the camera */
+      #example-scanning-overlay {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: white;
+        z-index: 9999;
+      }
+      #example-scanning-overlay.hidden {
+        display: none;
+      }
+    </style>
   </head>
   
-  <body>
-    <!-- 
-      - mindar-image: Links to your compiled .mind file 
-      - filterMinCF & filterBeta: These stabilize the model so it doesn't "jitter" or shake on the table.
-    -->
+  <body style="margin: 0; overflow: hidden;">
+    <!-- Loading Screen -->
+    <div id="example-scanning-overlay">
+      <h1>Loading Camera...</h1>
+    </div>
+
     <a-scene 
-      mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; filterMinCF:0.001; filterBeta: 0.01;" 
+      mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; uiScanning: #example-scanning-overlay;" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights: true" 
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <!-- 1. Name your scan file 'food.glb' and put it in the same folder as this HTML -->
+        <!-- Ensure your file is exactly named food.glb -->
         <a-asset-item id="food-model" src="./food.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- This entity attaches the model to the first marker in your .mind file -->
       <a-entity mindar-image-target="targetIndex: 0">
-        
-        <!-- THE DEBUG BOX: Keep this for now. If you see the box but not the food, the food file is the problem. -->
-        <a-box position="0 0 0" scale="0.05 0.05 0.05" color="red" opacity="0.5"></a-box>
+        <!-- THE RED BOX: If you see this, the tracking works! -->
+        <a-box position="0 0 0" scale="0.05 0.05 0.05" color="red"></a-box>
 
-        <!-- 
-          - src: Points to the asset ID above
-          - rotation: You may need to change 90 to 0 depending on how the scan was exported (upright vs flat)
-          - scale: Scans are often huge. 0.1 is a good starting point (10% of original size).
-        -->
+        <!-- Your Food Model -->
         <a-gltf-model 
-          id="food-entity"
           src="#food-model" 
           position="0 0 0" 
           scale="0.1 0.1 0.1" 
           rotation="90 0 0">
         </a-gltf-model>
-
       </a-entity>
     </a-scene>
+
+    <script>
+      // This script removes the "Loading" text once the camera starts
+      document.addEventListener("DOMContentLoaded", () => {
+        const sceneEl = document.querySelector('a-scene');
+        sceneEl.addEventListener("arReady", (event) => {
+          console.log("MindAR is ready");
+          document.querySelector('#example-scanning-overlay').classList.add('hidden');
+        });
+      });
+    </script>
   </body>
 </html>
