@@ -1,76 +1,87 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AR Menu MVP</title>
-    
-    <!-- Core Engine & Tracking -->
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Instant AR Menu</title>
+    <!-- Core Engines -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
 
     <style>
-      /* This makes sure the "Loading" text is visible over the camera */
-      #example-scanning-overlay {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background: white;
-        z-index: 9999;
-      }
-      #example-scanning-overlay.hidden {
-        display: none;
-      }
+        body { margin: 0; overflow: hidden; font-family: sans-serif; }
+        /* The UI that shows up before the camera starts */
+        #ui-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10000; text-align: center;
+        }
+        #start-button {
+            padding: 15px 30px; font-size: 20px; font-weight: bold;
+            background: #e63946; color: white; border: none; border-radius: 50px;
+            cursor: pointer; transition: 0.3s;
+        }
+        #start-button:active { transform: scale(0.95); }
+        .hidden { display: none !important; }
     </style>
-  </head>
-  
-  <body style="margin: 0; overflow: hidden;">
-    <!-- Loading Screen -->
-    <div id="example-scanning-overlay">
-      <h1>Loading Camera...</h1>
+</head>
+
+<body>
+    <!-- 1. The UX Start Screen (Required for most Android/iPhones) -->
+    <div id="ui-overlay">
+        <h1>Welcome to [Restaurant Name]</h1>
+        <p>Tap to see our 3D Menu</p>
+        <button id="start-button">START AR</button>
     </div>
 
+    <!-- 2. The AR Scene -->
+    <!-- 'autoStart: false' allows our button to trigger the camera manually -->
     <a-scene 
-      mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; uiScanning: #example-scanning-overlay;" 
-      color-space="sRGB" 
-      renderer="colorManagement: true, physicallyCorrectLights: true" 
-      vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: false">
+        mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: false; filterMinCF:0.001; filterBeta: 0.01;" 
+        color-space="sRGB" 
+        renderer="colorManagement: true, physicallyCorrectLights: true" 
+        vr-mode-ui="enabled: false" 
+        device-orientation-permission-ui="enabled: false">
       
-      <a-assets>
-        <!-- Ensure your file is exactly named food.glb -->
-        <a-asset-item id="food-model" src="./food.glb"></a-asset-item>
-      </a-assets>
+        <a-assets>
+            <a-asset-item id="food-model" src="./food.glb"></a-asset-item>
+        </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0">
-        <!-- THE RED BOX: If you see this, the tracking works! -->
-        <a-box position="0 0 0" scale="0.05 0.05 0.05" color="red"></a-box>
+        <a-entity mindar-image-target="targetIndex: 0">
+            <!-- DEBUG BOX: Confirms tracking is active -->
+            <a-box position="0 0 0" scale="0.05 0.05 0.05" color="red" opacity="0.5"></a-box>
 
-        <!-- Your Food Model -->
-        <a-gltf-model 
-          src="#food-model" 
-          position="0 0 0" 
-          scale="0.1 0.1 0.1" 
-          rotation="90 0 0">
-        </a-gltf-model>
-      </a-entity>
+            <a-gltf-model 
+                src="#food-model" 
+                position="0 0 0" 
+                scale="0.1 0.1 0.1" 
+                rotation="90 0 0">
+            </a-gltf-model>
+        </a-entity>
     </a-scene>
 
     <script>
-      // This script removes the "Loading" text once the camera starts
-      document.addEventListener("DOMContentLoaded", () => {
+        const startButton = document.querySelector("#start-button");
+        const uiOverlay = document.querySelector("#ui-overlay");
         const sceneEl = document.querySelector('a-scene');
-        sceneEl.addEventListener("arReady", (event) => {
-          console.log("MindAR is ready");
-          document.querySelector('#example-scanning-overlay').classList.add('hidden');
+
+        // When the user clicks the button:
+        startButton.addEventListener('click', () => {
+            uiOverlay.classList.add('hidden'); // Hide the button
+            
+            // Start the AR system
+            const { systems } = sceneEl;
+            systems['mindar-image-system'].start(); 
+            
+            console.log("AR Started by User");
         });
-      });
+
+        // Error handling if camera fails
+        sceneEl.addEventListener("arError", (event) => {
+            alert("Camera Error: Please ensure you are using HTTPS and have granted camera permissions.");
+        });
     </script>
-  </body>
+</body>
 </html>
