@@ -2,11 +2,34 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- Prevents 'White Screen' bugs from old cached service workers -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) { registration.unregister(); }
+        });
+      }
+    </script>
+
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   </head>
+  
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; uiLoading: no;" 
+    <!-- 
+      filterMinCF & filterBeta: Handles jitter.
+      missTolerance: Keeps model visible if tracking flickers.
+      warmupTolerance: Ensures stable lock-on.
+    -->
+    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; 
+                           autoStart: true; 
+                           uiLoading: no; 
+                           filterMinCF: 0.0001; 
+                           filterBeta: 0.001; 
+                           missTolerance: 30; 
+                           warmupTolerance: 5;" 
+             color-space="sRGB" 
              renderer="colorManagement: true, physicallyCorrectLights"
              vr-mode-ui="enabled: false" 
              device-orientation-permission-ui="enabled: false">
@@ -15,29 +38,18 @@
         <a-asset-item id="food-model" src="./food.glb"></a-asset-item>
       </a-assets>
 
-      <!-- LIGHTING: This makes sure your food isn't just a black silhouette -->
-      <a-light type="ambient" intensity="1.5"></a-light>
-      <a-light type="directional" position="0 1 1" intensity="1"></a-light>
-
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
-           
-           <!-- THE DEBUG ANCHOR: A bright, glowing red box -->
-           <a-box position="0 0 0" scale="0.1 0.1 0.1" material="color: red; emissive: red; emissiveIntensity: 0.5"></a-box>
-
-           <!-- BACKUP OBJECT: A massive green sphere floating higher up -->
-           <!-- If you see this green ball but not the food, your food.glb is broken -->
-           <a-sphere position="0 0.5 0" radius="0.1" color="green"></a-sphere>
-
-           <!-- THE FOOD MODEL -->
-           <!-- We are using position 0 0 0 to stick it directly on the marker -->
+           <!-- The Food Model -->
+           <!-- Adjust scale if it's too small (e.g., 5 5 5) or too big (e.g., 0.5 0.5 0.5) -->
            <a-entity gltf-model="#food-model" 
                      position="0 0 0" 
+                     rotation="0 0 0" 
                      scale="1 1 1">
            </a-entity>
-      
       </a-entity>
+      
     </a-scene>
   </body>
 </html>
