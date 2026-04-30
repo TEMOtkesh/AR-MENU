@@ -9,17 +9,25 @@
     <script src="https://quadjr.github.io/aframe-gaussian-splatting/index.js"></script>
   </head>
   <body>
-    <!-- The Scene Setup -->
+    <!-- The Scene Setup (VR buttons hidden) -->
     <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true;" 
              color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights">
+             renderer="colorManagement: true, physicallyCorrectLights"
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
       
+      <!-- The Virtual Camera -->
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- The Target Anchor -->
+      <!-- The Target Anchor (Looking for your new complex artwork) -->
       <a-entity mindar-image-target="targetIndex: 0">
-           <!-- YOUR 3D MODEL -->
-           <a-entity gaussian_splatting="src: .Qatami.splat;" position="0 0 0" scale="1 1 1"></a-entity>
+           
+           <!-- YOUR 3D MODEL (Qatami) with the corrected scale -->
+           <a-entity gaussian_splatting="src: ./Qatami.splat;" 
+                     position="0 0 0" 
+                     scale="0.1 0.1 0.1">
+           </a-entity>
+      
       </a-entity>
     </a-scene>
   </body>
