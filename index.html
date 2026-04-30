@@ -3,36 +3,49 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     
-    <!-- THE SECURITY BYPASS: Must be the very first script -->
-    <script src="coi-serviceworker.js"></script>
-    
     <!-- Core Engine & Tracking Libraries -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://quadjr.github.io/aframe-gaussian-splatting/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
   </head>
+  
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true;" 
-             color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights"
-             vr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false">
+    <!-- 
+      - mindar-image: Links to your compiled .mind file 
+      - filterMinCF & filterBeta: These stabilize the model so it doesn't "jitter" or shake on the table.
+    -->
+    <a-scene 
+      mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; filterMinCF:0.001; filterBeta: 0.01;" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights: true" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <a-asset-item id="food-splat" src="./Qatami.splat"></a-asset-item>
+        <!-- 1. Name your scan file 'food.glb' and put it in the same folder as this HTML -->
+        <a-asset-item id="food-model" src="./food.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
+      <!-- This entity attaches the model to the first marker in your .mind file -->
       <a-entity mindar-image-target="targetIndex: 0">
-           <!-- THE DEBUG BOX: So we still know tracking works -->
-           <a-box position="0 0 0" scale="0.1 0.1 0.1" color="red" opacity="0.6"></a-box>
+        
+        <!-- THE DEBUG BOX: Keep this for now. If you see the box but not the food, the food file is the problem. -->
+        <a-box position="0 0 0" scale="0.05 0.05 0.05" color="red" opacity="0.5"></a-box>
 
-           <!-- YOUR GS FOOD MODEL -->
-           <a-entity gaussian_splatting="src: #food-splat;" 
-                     position="0 0 0" 
-                     scale="10 10 10">
-           </a-entity>
+        <!-- 
+          - src: Points to the asset ID above
+          - rotation: You may need to change 90 to 0 depending on how the scan was exported (upright vs flat)
+          - scale: Scans are often huge. 0.1 is a good starting point (10% of original size).
+        -->
+        <a-gltf-model 
+          id="food-entity"
+          src="#food-model" 
+          position="0 0 0" 
+          scale="0.1 0.1 0.1" 
+          rotation="90 0 0">
+        </a-gltf-model>
+
       </a-entity>
     </a-scene>
   </body>
