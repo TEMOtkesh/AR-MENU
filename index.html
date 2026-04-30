@@ -1,76 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AR Menu</title>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- Core Libraries: MindAR for tracking and A-Frame for 3D rendering -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  </head>
+  
+  <body>
+    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true;" 
+             color-space="sRGB" 
+             renderer="colorManagement: true, physicallyCorrectLights"
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <!-- The food model: This is preloaded so it appears instantly when the marker is found -->
+        <a-asset-item id="food-model" src="./food.glb"></a-asset-item>
+      </a-assets>
 
-  <!-- A-Frame first, then MindAR. Order matters. -->
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { overflow: hidden; font-family: sans-serif; }
-
-    #hint {
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
-      color: #fff;
-      padding: 10px 24px;
-      border-radius: 50px;
-      font-size: 15px;
-      z-index: 999;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    .hidden { display: none !important; }
-  </style>
-</head>
-<body>
-
-  <div id="hint">Point at the table marker...</div>
-
-  <a-scene
-    mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; filterMinCF: 0.001; filterBeta: 0.01;"
-    color-space="sRGB"
-    renderer="colorManagement: true; physicallyCorrectLights: true;"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
-    embedded
-  >
-    <a-light type="ambient" intensity="0.8"></a-light>
-    <a-light type="directional" intensity="1.2" position="1 3 2"></a-light>
-
-    <a-entity mindar-image-target="targetIndex: 0">
-      <a-gltf-model
-        src="./food.glb"
-        position="0 0 0"
-        rotation="0 0 0"
-        scale="0.1 0.1 0.1"
-        animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear"
-      ></a-gltf-model>
-    </a-entity>
-
-  </a-scene>
-
-  <script>
-    const hint = document.getElementById('hint');
-    const scene = document.querySelector('a-scene');
-
-    scene.addEventListener('targetFound', () => {
-      hint.textContent = '✓ Got it!';
-      setTimeout(() => hint.classList.add('hidden'), 1500);
-    });
-
-    scene.addEventListener('targetLost', () => {
-      hint.classList.remove('hidden');
-      hint.textContent = 'Point at the table marker...';
-    });
-  </script>
-
-</body>
+      <!-- targetIndex: 0 refers to the first image inside your .mind file -->
+      <a-entity mindar-image-target="targetIndex: 0">
+           
+           <!-- THE 3D MODEL -->
+           <!-- Position: 0 0 0 sits it directly on the marker -->
+           <!-- Scale: Adjusted to 1 1 1; change this if the model is too big or small -->
+           <a-entity gltf-model="#food-model" 
+                     position="0 0 0" 
+                     rotation="0 0 0" 
+                     scale="1 1 1">
+           </a-entity>
+      
+      </a-entity>
+    </a-scene>
+  </body>
 </html>
