@@ -3,28 +3,35 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     
+    <!-- Core Engine & Tracking Libraries -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://quadjr.github.io/aframe-gaussian-splatting/index.js"></script>
   </head>
   <body>
+    <!-- The Scene Setup -->
     <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true;" 
              color-space="sRGB" 
              renderer="colorManagement: true, physicallyCorrectLights"
              vr-mode-ui="enabled: false" 
              device-orientation-permission-ui="enabled: false">
       
+      <!-- Preloader: Forces the browser to load the 525kb file instantly -->
+      <a-assets>
+        <a-asset-item id="food-splat" src="./Qatami.splat"></a-asset-item>
+      </a-assets>
+
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
            
-           <!-- THE DEBUG BOX: This will float right above the marker -->
-           <a-box position="0 0.5 0" scale="0.5 0.5 0.5" color="red"></a-box>
+           <!-- DEBUG ANCHOR: A 10cm red box. If you see this, tracking works. -->
+           <a-box position="0 0 0" scale="0.1 0.1 0.1" color="red" opacity="0.6"></a-box>
 
-           <!-- YOUR MODEL: Scaled up to 10x size to make it huge -->
-           <a-entity gaussian_splatting="src: ./Qatami.splat;" 
+           <!-- YOUR FOOD MODEL: Scaled up to standard size -->
+           <a-entity gaussian_splatting="src: #food-splat;" 
                      position="0 0 0" 
-                     scale="10 10 10">
+                     scale="1 1 1">
            </a-entity>
       
       </a-entity>
