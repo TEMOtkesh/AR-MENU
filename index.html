@@ -2,16 +2,37 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- THE SECURITY BYPASS: Must be the very first script -->
+    <script src="coi-serviceworker.js"></script>
+    
+    <!-- Core Engine & Tracking Libraries -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <!-- SPLAT SCRIPT COMPLETELY REMOVED -->
+    <script src="https://quadjr.github.io/aframe-gaussian-splatting/index.js"></script>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true;" 
+             color-space="sRGB" 
+             renderer="colorManagement: true, physicallyCorrectLights"
+             vr-mode-ui="enabled: false" 
+             device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <a-asset-item id="food-splat" src="./Qatami.splat"></a-asset-item>
+      </a-assets>
+
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
       <a-entity mindar-image-target="targetIndex: 0">
-           <!-- ONLY THE RED BOX -->
-           <a-box position="0 0 0" scale="0.1 0.1 0.1" color="red"></a-box>
+           <!-- THE DEBUG BOX: So we still know tracking works -->
+           <a-box position="0 0 0" scale="0.1 0.1 0.1" color="red" opacity="0.6"></a-box>
+
+           <!-- YOUR GS FOOD MODEL -->
+           <a-entity gaussian_splatting="src: #food-splat;" 
+                     position="0 0 0" 
+                     scale="1 1 1">
+           </a-entity>
       </a-entity>
     </a-scene>
   </body>
