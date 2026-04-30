@@ -3,37 +3,33 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     
-    <!-- Core Libraries: MindAR for tracking and A-Frame for 3D rendering -->
+    <!-- SCRIPT TO KILL OLD SERVICE WORKERS -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+          }
+        });
+      }
+    </script>
+
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   </head>
-  
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true;" 
-             color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights"
+    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; uiLoading: no;" 
              vr-mode-ui="enabled: false" 
              device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <!-- The food model: This is preloaded so it appears instantly when the marker is found -->
         <a-asset-item id="food-model" src="./food.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- targetIndex: 0 refers to the first image inside your .mind file -->
       <a-entity mindar-image-target="targetIndex: 0">
-           
-           <!-- THE 3D MODEL -->
-           <!-- Position: 0 0 0 sits it directly on the marker -->
-           <!-- Scale: Adjusted to 1 1 1; change this if the model is too big or small -->
-           <a-entity gltf-model="#food-model" 
-                     position="0 0 0" 
-                     rotation="0 0 0" 
-                     scale="1 1 1">
-           </a-entity>
-      
+           <a-entity gltf-model="#food-model" position="0 0 0" scale="1 1 1"></a-entity>
       </a-entity>
     </a-scene>
   </body>
