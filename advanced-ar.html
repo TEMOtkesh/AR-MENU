@@ -8,6 +8,9 @@
         body { margin: 0; background: #222; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
         model-viewer { width: 90%; height: 70vh; background-color: #fff; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .ar-btn { background: #ff4757; color: white; border: none; padding: 15px 30px; border-radius: 30px; margin-top: 20px; font-weight: bold; font-size: 16px; cursor: pointer;}
+        
+        /* The Escape Hatch Button Style */
+        .escape-hatch { margin-top: 15px; background: transparent; color: #aaa; border: 1px solid #555; padding: 10px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -19,5 +22,10 @@
                   auto-rotate>
         <button slot="ar-button" class="ar-btn">View on Table</button>
     </model-viewer>
+
+    <button class="escape-hatch" onclick="window.location.replace('mind-ar-fallback.html')">
+        Camera not turning on? Click here.
+    </button>
+
 </body>
 </html>
