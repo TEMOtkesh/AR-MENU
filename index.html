@@ -1,30 +1,52 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  </head>
-  <body>
-    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; uiLoading: no; filterMinCF: 0.0001; filterBeta: 0.001; missTolerance: 30;" 
-             color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights"
-             vr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false">
-      
-      <a-assets>
-        <a-asset-item id="food-model" src="./food.glb"></a-asset-item>
-      </a-assets>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Loading Menu...</title>
+    <style>
+        body { 
+            background-color: #1a1a1a; 
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            font-family: sans-serif; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body>
+    <h2>Loading 3D Menu...</h2>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <script>
+        async function routeUser() {
+            // Check iOS Quick Look support
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const a = document.createElement('a');
+            const supportsQuickLook = a.relList && a.relList.supports && a.relList.supports('ar');
 
-      <a-entity mindar-image-target="targetIndex: 0">
-           <a-entity gltf-model="#food-model" 
-                     position="0 -1 0" 
-                     rotation="90 0 0" 
-                     scale="1 1 1">
-           </a-entity>
-      </a-entity>
-    </a-scene>
-  </body>
+            // Check Android WebXR/ARCore support
+            let supportsWebXR = false;
+            if (navigator.xr) {
+                try { 
+                    supportsWebXR = await navigator.xr.isSessionSupported('immersive-ar'); 
+                } catch (e) { 
+                    supportsWebXR = false; 
+                }
+            }
+
+            // Route based on capabilities
+            // Using replace() so they can't hit the "Back" button and get stuck in a loop
+            if ((isIOS && supportsQuickLook) || supportsWebXR) {
+                window.location.replace("advanced-ar.html");
+            } else {
+                window.location.replace("mind-ar-fallback.html");
+            }
+        }
+
+        // Execute immediately
+        routeUser();
+    </script>
+</body>
 </html>
