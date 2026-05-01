@@ -20,50 +20,27 @@
     <h2>Loading 3D Menu...</h2>
 
     <script>
-        async function routeUser() {
+        function routeUser() {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             
-            // 1. Apple Check
+            // 1. Bulletproof Apple Check
             const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
             const a = document.createElement('a');
             const supportsQuickLook = a.relList && a.relList.supports && a.relList.supports('ar');
 
-            // 2. Android Check
-            const isAndroid = /android/i.test(ua);
-            let supportsWebXR = false;
-            let isSafeBrowser = true;
-
-            if (isAndroid) {
-                // Check if WebXR is theoretically supported
-                if (navigator.xr) {
-                    try { supportsWebXR = await navigator.xr.isSessionSupported('immersive-ar'); } 
-                    catch (e) { supportsWebXR = false; }
-                }
-
-                // THE PARANOIA FILTER
-                // If they are using a Xiaomi Browser, Samsung Internet, or an In-App WebView (like a QR scanner app),
-                // we force them to the MindAR fallback automatically because those browsers break AR intents.
-                if (/MiuiBrowser|wv|FBAN|FBAV|Instagram|samsungbrowser|opr/i.test(ua)) {
-                    isSafeBrowser = false;
-                }
-            }
-
-            // 3. The Strict Routing Logic
+            // 2. The Hard OS Split
             if (isIOS && supportsQuickLook) {
-                // Perfect iPhones
-                window.location.replace("advanced-ar.html");
-            } 
-            else if (isAndroid && supportsWebXR && isSafeBrowser) {
-                // Perfect, clean Android Flagships running native Chrome
+                // Perfect iPhones get the native Google Model Viewer
                 window.location.replace("advanced-ar.html");
             } 
             else {
-                // Everyone else: Poco X6, older phones, in-app scanners, Xiaomi browsers
-                // Automatically sorted to the working camera!
+                // EVERYONE ELSE (Poco, Xiaomi, Samsung, Desktop)
+                // Automatically routed straight to the working MindAR camera. No lies, no white screens.
                 window.location.replace("mind-ar-fallback.html");
             }
         }
 
+        // Execute immediately
         routeUser();
     </script>
 </body>
