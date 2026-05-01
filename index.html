@@ -2,45 +2,9 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) { registration.unregister(); }
-        });
-      }
-    </script>
-
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-    <script>
-      AFRAME.registerComponent('gyro-lock', {
-        init: function () {
-          this.marker = this.el.parentNode;
-          // Detach the food from the marker so it stops inheriting the camera tilt
-          this.el.sceneEl.appendChild(this.el);
-        },
-        tick: function () {
-          // Only show the food if the camera can see the marker
-          if (this.marker.object3D.visible) {
-            this.el.object3D.visible = true;
-            
-            // 1. Track the position of the physical menu
-            let pos = new THREE.Vector3();
-            this.marker.object3D.getWorldPosition(pos);
-            this.el.object3D.position.copy(pos);
-            
-            // 2. Force it perfectly upright (ignoring marker tilt)
-            this.el.setAttribute('rotation', '90 0 0');
-          } else {
-            this.el.object3D.visible = false;
-          }
-        }
-      });
-    </script>
   </head>
-  
   <body>
     <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; uiLoading: no; filterMinCF: 0.0001; filterBeta: 0.001; missTolerance: 30;" 
              color-space="sRGB" 
@@ -56,11 +20,11 @@
 
       <a-entity mindar-image-target="targetIndex: 0">
            <a-entity gltf-model="#food-model" 
-                     gyro-lock
+                     position="0 0 0" 
+                     rotation="90 0 0" 
                      scale="1 1 1">
            </a-entity>
       </a-entity>
-      
     </a-scene>
   </body>
 </html>
