@@ -23,19 +23,17 @@
         function routeUser() {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             
-            // 1. Bulletproof Apple Check
-            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-            const a = document.createElement('a');
-            const supportsQuickLook = a.relList && a.relList.supports && a.relList.supports('ar');
+            // 1. The "Pure Apple" Bypass
+            // This checks for iPhones, iPods, and modern iPads (which pretend to be Macs)
+            const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-            // 2. The Hard OS Split
-            if (isIOS && supportsQuickLook) {
-                // Perfect iPhones get the native Google Model Viewer
+            // 2. The Absolute OS Split
+            if (isIOS) {
+                // ALL Apple devices go straight to the premium Model Viewer
                 window.location.replace("advanced-ar.html");
             } 
             else {
-                // EVERYONE ELSE (Poco, Xiaomi, Samsung, Desktop)
-                // Automatically routed straight to the working MindAR camera. No lies, no white screens.
+                // ALL Androids (Poco, Xiaomi, Samsung) go straight to the working MindAR camera
                 window.location.replace("mind-ar-fallback.html");
             }
         }
