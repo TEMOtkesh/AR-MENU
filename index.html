@@ -15,26 +15,34 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
     <script>
-      AFRAME.registerComponent('snap-and-stay', {
+      AFRAME.registerComponent('gyro-lock', {
         init: function () {
-          this.el.addEventListener('targetFound', () => {
-            console.log("Marker Found. Locking model in place.");
-            // This freezes the MindAR engine entirely. 
-            // The model stays exactly where it was at the moment of discovery.
-            this.el.sceneEl.systems['mindar-image-system'].stop(); 
-          });
+          this.marker = this.el.parentNode;
+          // Detach the food from the marker so it stops inheriting the camera tilt
+          this.el.sceneEl.appendChild(this.el);
+        },
+        tick: function () {
+          // Only show the food if the camera can see the marker
+          if (this.marker.object3D.visible) {
+            this.el.object3D.visible = true;
+            
+            // 1. Track the position of the physical menu
+            let pos = new THREE.Vector3();
+            this.marker.object3D.getWorldPosition(pos);
+            this.el.object3D.position.copy(pos);
+            
+            // 2. Force it perfectly upright (ignoring marker tilt)
+            this.el.setAttribute('rotation', '90 0 0');
+          } else {
+            this.el.object3D.visible = false;
+          }
         }
       });
     </script>
   </head>
   
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; 
-                           autoStart: true; 
-                           uiLoading: no; 
-                           filterMinCF: 0.0001; 
-                           filterBeta: 0.001;
-                           missTolerance: 30;" 
+    <a-scene mindar-image="imageTargetSrc: ./menu-marker.mind; autoStart: true; uiLoading: no; filterMinCF: 0.0001; filterBeta: 0.001; missTolerance: 30;" 
              color-space="sRGB" 
              renderer="colorManagement: true, physicallyCorrectLights"
              vr-mode-ui="enabled: false" 
@@ -46,10 +54,9 @@
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0" snap-and-stay>
+      <a-entity mindar-image-target="targetIndex: 0">
            <a-entity gltf-model="#food-model" 
-                     position="0 0 0" 
-                     rotation="90 0 0" 
+                     gyro-lock
                      scale="1 1 1">
            </a-entity>
       </a-entity>
